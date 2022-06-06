@@ -1,0 +1,53 @@
+
+name: Continous Release Action
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  Build-For-Linux:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out
+      uses: actions/checkout@v2
+
+    - name: Install Deps
+      run: sudo apt-get install make clang
+
+    - name: Build
+      run: make -j2
+
+    - name: Strip Debug Info
+      run: strip ./kilo.elf
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: linux_binary
+        path: ./kilo.elf
+        if-no-files-found: error
+
+  Create-Release:
+    needs: [Build-For-Linux]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Clean previous binaries
+      run: rm -f kilo.elf
+
+    - name: Download Linux build artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: linux_binary
+
+    - name: Update/Create Continous Release
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "continuous"
+        prerelease: true
+        title: "Kilo Continuous Release"
+        files: |
+            kilo.elf
