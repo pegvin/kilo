@@ -1,5 +1,3 @@
-/*** includes ***/
-
 #define _DEFAULT_SOURCE
 #define _BSD_SOURCE
 #define _GNU_SOURCE
@@ -17,8 +15,9 @@
 #include <time.h>
 #include <unistd.h>
 
-/*** defines ***/
-
+/******************************************************
+                      DEFINES                         *
+******************************************************/
 #define KILO_VERSION "0.0.1"
 #define KILO_TAB_STOP 8
 #define KILO_QUIT_TIMES 3
@@ -52,8 +51,9 @@ enum editorHighlight {
 #define HL_HIGHLIGHT_NUMBERS (1<<0)
 #define HL_HIGHLIGHT_STRINGS (1<<1)
 
-/*** data ***/
-
+/******************************************************
+                       DATA                           *
+******************************************************/
 struct editorSyntax {
 	char *filetype;
 	char **filematch;
@@ -93,8 +93,9 @@ struct editorConfig {
 
 struct editorConfig E;
 
-/*** filetypes ***/
-
+/******************************************************
+                     FILETYPES                        *
+******************************************************/
 char *C_HL_extensions[] = { ".c", ".h", ".cpp", NULL };
 char *C_HL_keywords[] = {
 	"switch", "if", "while", "for", "break", "continue", "return", "else",
@@ -116,11 +117,45 @@ struct editorSyntax HLDB[] = {
 
 #define HLDB_ENTRIES (sizeof(HLDB) / sizeof(HLDB[0]))
 
-/*** prototypes ***/
+#include "main.h"
 
-void editorSetStatusMessage(const char *fmt, ...);
-void editorRefreshScreen();
-char *editorPrompt(char *prompt, void (*callback)(char *, int));
+/*** init ***/
+
+void initEditor() {
+	E.cx = 0;
+	E.cy = 0;
+	E.rx = 0;
+	E.rowoff = 0;
+	E.coloff = 0;
+	E.numrows = 0;
+	E.row = NULL;
+	E.dirty = 0;
+	E.filename = NULL;
+	E.statusmsg[0] = '\0';
+	E.statusmsg_time = 0;
+	E.syntax = NULL;
+
+	if (getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
+	E.screenrows -= 2;
+}
+
+int main(int argc, char *argv[]) {
+	enableRawMode();
+	initEditor();
+	if (argc >= 2) {
+		editorOpen(argv[1]);
+	}
+
+	editorSetStatusMessage(
+		"HELP: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F = find");
+
+	while (1) {
+		editorRefreshScreen();
+		editorProcessKeypress();
+	}
+
+	return 0;
+}
 
 /*** terminal ***/
 
@@ -701,13 +736,6 @@ void editorFind() {
 
 /*** append buffer ***/
 
-struct abuf {
-	char *b;
-	int len;
-};
-
-#define ABUF_INIT {NULL, 0}
-
 void abAppend(struct abuf *ab, const char *s, int len) {
 	char *new = realloc(ab->b, ab->len + len);
 
@@ -1027,42 +1055,4 @@ void editorProcessKeypress() {
 	}
 
 	quit_times = KILO_QUIT_TIMES;
-}
-
-/*** init ***/
-
-void initEditor() {
-	E.cx = 0;
-	E.cy = 0;
-	E.rx = 0;
-	E.rowoff = 0;
-	E.coloff = 0;
-	E.numrows = 0;
-	E.row = NULL;
-	E.dirty = 0;
-	E.filename = NULL;
-	E.statusmsg[0] = '\0';
-	E.statusmsg_time = 0;
-	E.syntax = NULL;
-
-	if (getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
-	E.screenrows -= 2;
-}
-
-int main(int argc, char *argv[]) {
-	enableRawMode();
-	initEditor();
-	if (argc >= 2) {
-		editorOpen(argv[1]);
-	}
-
-	editorSetStatusMessage(
-		"HELP: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F = find");
-
-	while (1) {
-		editorRefreshScreen();
-		editorProcessKeypress();
-	}
-
-	return 0;
 }
