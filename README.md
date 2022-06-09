@@ -6,7 +6,7 @@ A Text Editor Made Using ["Make Your Own Text Editor"](https://viewsourcecode.or
 More Coming Soon!
 - [x] C
 - [x] C++
-- [ ] Python
+- [x] Python
 - [ ] JavaScript
 - [ ] Rust
 
