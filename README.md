@@ -7,7 +7,7 @@ More Coming Soon!
 - [x] C
 - [x] C++
 - [x] Python
-- [ ] JavaScript
+- [x] JavaScript
 - [ ] Rust
 
 ---

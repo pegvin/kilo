@@ -1,6 +1,7 @@
 #include "../syntax/c.h"
 #include "../syntax/cpp.h"
 #include "../syntax/python.h"
+#include "../syntax/javascript.h"
 
 struct editorSyntax HLDB[] = {
 	{
@@ -22,6 +23,13 @@ struct editorSyntax HLDB[] = {
 		PYTHON_HL_extensions,
 		PYTHON_HL_keywords,
 		"#", "\"\"\"", "\"\"\"",
+		HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+	},
+	{
+		"JavaScript",
+		JAVASCRIPT_HL_extensions,
+		JAVASCRIPT_HL_keywords,
+		"//", "/*", "*/",
 		HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
 	},
 };
