@@ -8,7 +8,6 @@ More Coming Soon!
 - [x] C++
 - [x] Python
 - [x] JavaScript
-- [ ] Rust
 
 ---
 ## Todo
